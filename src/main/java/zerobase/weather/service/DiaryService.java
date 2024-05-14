@@ -5,11 +5,14 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
+import zerobase.weather.WeatherApplication;
 import zerobase.weather.domain.DateWeather;
 import zerobase.weather.domain.Diary;
 import zerobase.weather.repository.DateWeatherRepository;
@@ -33,6 +36,8 @@ public class DiaryService {
     private final DiaryRepository diaryRepository; // 레포지토리 갖고옴
     private final DateWeatherRepository dateWeatherRepository;
 
+    private static final Logger logger = LoggerFactory.getLogger(WeatherApplication.class);
+
     public DiaryService(DiaryRepository diaryRepository, DateWeatherRepository dateWeatherRepository) {
         this.diaryRepository = diaryRepository;
         this.dateWeatherRepository = dateWeatherRepository;
@@ -46,6 +51,7 @@ public class DiaryService {
 
     @Transactional(isolation = Isolation.SERIALIZABLE)
     public void createDiary(LocalDate date, String text) {
+        logger.info("started to create diary"); // 로그 남기기
 
         // 날씨 데이터 가져오기 (API 에서 가져오기? or DB 에서 가져오기)
         DateWeather dateWeather = getDateWeather(date);
@@ -56,6 +62,8 @@ public class DiaryService {
         nowDiary.setText(text); // 글
 
         diaryRepository.save(nowDiary); // 레포지토리에 저장
+
+        logger.info("end to create diary"); // 로그 남기기
     }
 
     private DateWeather getWeatherFromApi() { // 새벽 1시마다 날씨 받아오기
@@ -89,6 +97,7 @@ public class DiaryService {
     // 다이어리 조회하기
     @Transactional(readOnly = true) // 읽기전용
     public List<Diary> readDiary(LocalDate date) {
+        logger.debug("read diary");
         return diaryRepository.findAllByDate(date); // db에서 가져와야함
     }
 
