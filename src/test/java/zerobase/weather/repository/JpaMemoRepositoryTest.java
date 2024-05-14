@@ -9,15 +9,21 @@ import zerobase.weather.domain.Memo;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
-@Transactional
+@Transactional // 롤백을 위해 쓴 트랜잭션
 public class JpaMemoRepositoryTest {
 
     @Autowired
     JpaMemoRepository jpaMemoRepository;
+
+    @Test
+    void findAllMemoTest() {
+        List<Memo> memoList = jpaMemoRepository.findAll();
+        System.out.println(memoList);
+        assertNotNull(memoList);
+    }
 
     @Test
     void insertMemoTest() {
